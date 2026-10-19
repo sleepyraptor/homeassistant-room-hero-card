@@ -1,6 +1,6 @@
 {
   "name": "room-hero-card",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Home Assistant card: a photo of the room that follows its light and the night, with a pill to switch it, values and indicators",

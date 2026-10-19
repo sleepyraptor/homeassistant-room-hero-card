@@ -186,3 +186,22 @@ test("bad lists are rejected clearly", async () => {
   const { normalise } = await boot();
   assert.throws(() => normalise({ sensors: "sensor.t" }), /sensors must be a list/);
 });
+
+test("a tap on the photo runs the card action; taps on the pill do not reach it", async () => {
+  const el = await makeCard({ ...BASE, card_tap_action: { action: "navigate", navigation_path: "/lovelace/livingroom" } }, fakeHass({ "light.sofa": st("off") }));
+  const got = [];
+  el.addEventListener("hass-action", (e) => got.push([e.detail.action, e.detail.config.tap_action.action]));
+  const press = (node) => {
+    node.dispatchEvent(new globalThis.window.PointerEvent("pointerdown", { bubbles: true }));
+    node.dispatchEvent(new globalThis.window.PointerEvent("pointerup", { bubbles: true }));
+  };
+  assert.ok($(el, "ha-card.tappable"));
+  press($(el, ".bg"));
+  press($(el, ".pill"));
+  assert.deepEqual(got, [["tap", "navigate"], ["tap", "more-info"]]);
+});
+
+test("without a card action the photo is not tappable", async () => {
+  const el = await makeCard(BASE, fakeHass({ "light.sofa": st("off") }));
+  assert.equal($(el, "ha-card.tappable"), null);
+});

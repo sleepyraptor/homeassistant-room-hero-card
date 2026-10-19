@@ -138,6 +138,9 @@ background and is ready to fill in.
 | `double_tap_action` | — | Double tap on the pill. |
 | `icon_tap_action` | `toggle` the light | Tap on the pill's icon. |
 | `icon_hold_action` | `more-info` of the light | Hold on the pill's icon. |
+| `card_tap_action` | — | Tap anywhere on the photo outside the pill, values and indicators — e.g. `navigate` to the room's page. |
+| `card_hold_action` | — | Hold on the photo. |
+| `card_double_tap_action` | — | Double tap on the photo. |
 
 Every action Home Assistant supports works: `more-info`, `toggle`, `navigate`, `url`, `perform-action`,
 `assist`, `none`.
@@ -234,6 +237,7 @@ mushroom card on top, styled with card-mod:
 | `conditional` + `icon` for motion | `indicators: [{ preset: motion, entity: … }]` |
 | blinking dot with a `@keyframes` in card-mod | `indicators: [{ preset: recording, entity: … }]` |
 | mushroom template card with glass card-mod as the room name | the pill: `name`, `icon`, `pill_position`, `pill_style` |
+| a transparent `image` element over the whole card that navigates | `card_tap_action: { action: navigate, navigation_path: … }` |
 
 ## Development
 

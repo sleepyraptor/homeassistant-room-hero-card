@@ -24,7 +24,7 @@ test("every option is in the form, grouped in sections", async () => {
   const s = JSON.stringify(main(ed).schema);
   for (const k of ["name", "icon", "image", "image_entity", "height", "radius", "image_position", "light", "glow", "border",
     "glow_strength", "state_on", "state_off", "show_state", "pill_position", "pill_style", "values_position",
-    "night", "night_entity", "night_state", "dim", "tap_action", "hold_action", "double_tap_action", "icon_tap_action", "icon_hold_action"]) {
+    "night", "night_entity", "night_state", "dim", "tap_action", "hold_action", "double_tap_action", "icon_tap_action", "icon_hold_action", "card_tap_action", "card_hold_action", "card_double_tap_action"]) {
     assert.match(s, new RegExp(`"name":"${k}"`), k);
   }
   assert.equal((s.match(/"type":"expandable"/g) || []).length, 4);

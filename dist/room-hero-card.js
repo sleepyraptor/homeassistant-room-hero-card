@@ -5,7 +5,7 @@
  * Everything is set from the visual editor: no templates, no CSS.
  * https://github.com/sleepyraptor/homeassistant-room-hero-card
  */
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
 
 const I18N = {
   en: {
@@ -45,6 +45,10 @@ const I18N = {
     f_double_tap_action: "Double tap on the pill",
     f_icon_tap_action: "Tap on the pill's icon",
     f_icon_hold_action: "Hold on the pill's icon",
+    f_card_tap_action: "Tap on the photo",
+    f_card_hold_action: "Hold on the photo",
+    f_card_double_tap_action: "Double tap on the photo",
+    h_card_tap_action: "Anywhere outside the pill, values and indicators — e.g. open the room's page",
     f_values_position: "Values position",
     sensors: "Values",
     h_sensors: "Shown in a corner: temperature, humidity, anything.",
@@ -123,6 +127,10 @@ const I18N = {
     f_double_tap_action: "Doppio tap sulla pillola",
     f_icon_tap_action: "Tap sull'icona della pillola",
     f_icon_hold_action: "Pressione lunga sull'icona della pillola",
+    f_card_tap_action: "Tap sulla foto",
+    f_card_hold_action: "Pressione lunga sulla foto",
+    f_card_double_tap_action: "Doppio tap sulla foto",
+    h_card_tap_action: "Ovunque fuori da pillola, valori e indicatori — es. apri la pagina della stanza",
     f_values_position: "Posizione dei valori",
     sensors: "Valori",
     h_sensors: "Mostrati in un angolo: temperatura, umidità, qualsiasi cosa.",
@@ -327,6 +335,7 @@ const CSS = `
 ha-card{position:relative;overflow:hidden;isolation:isolate;border:none;background:var(--secondary-background-color);
   transition:box-shadow .8s ease-in-out;-webkit-tap-highlight-color:transparent}
 .bg{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat}
+ha-card.tappable{cursor:pointer}
 .bg.none{background:radial-gradient(120% 150% at 30% 0%,rgba(80,92,120,.55) 0%,rgba(10,13,22,1) 70%)}
 .shade{position:absolute;inset:0;z-index:1;pointer-events:none;transition:background .8s ease-in-out}
 .corner{position:absolute;z-index:2;display:flex;align-items:center;gap:6px;padding:10px 12px}
@@ -493,6 +502,19 @@ class RoomHeroCard extends HTMLElement {
     return c.image;
   }
 
+  /** The actions of a tap on the photo, or null when it has none. */
+  _cardActions() {
+    const c = this._config;
+    const some = (a) => a && a.action && a.action !== "none";
+    if (!some(c.card_tap_action) && !some(c.card_hold_action) && !some(c.card_double_tap_action)) return null;
+    return {
+      entity: c.light,
+      tap_action: c.card_tap_action || { action: "none" },
+      hold_action: c.card_hold_action || { action: "none" },
+      double_tap_action: c.card_double_tap_action
+    };
+  }
+
   _night() {
     const c = this._config;
     if (c.night === "always") return true;
@@ -539,7 +561,7 @@ class RoomHeroCard extends HTMLElement {
     corners[vp] = vp.endsWith("right") ? [...vals.reverse(), ...corners[vp]] : [...corners[vp], ...vals];
 
     this.shadowRoot.innerHTML = `<style>${CSS}</style>
-      <ha-card style="height:${num(c.height, 200)}px;border-radius:${num(c.radius, 20)}px;box-shadow:${edge(look, c.border)}">
+      <ha-card class="${this._cardActions() ? "tappable" : ""}" style="height:${num(c.height, 200)}px;border-radius:${num(c.radius, 20)}px;box-shadow:${edge(look, c.border)}">
         <div class="bg${img ? "" : " none"}" style="${img ? `background-image:url('${esc(img)}');background-position:${esc(c.image_position)};` : ""}"></div>
         <div class="shade" style="background:${shade(look, night, { glow: c.glow, strength: num(c.glow_strength, 0.14), dim: num(c.dim, 0.82) })}"></div>
         ${CORNERS.map((k) => (corners[k].length ? `<div class="corner ${k}">${corners[k].join("")}</div>` : "")).join("")}
@@ -550,6 +572,9 @@ class RoomHeroCard extends HTMLElement {
       </ha-card>`;
 
     const root = this.shadowRoot;
+    const actions = this._cardActions();
+    // The photo itself: the pill, values and indicators stop their own events, so only the rest reaches it.
+    if (actions) bind(root.querySelector("ha-card"), actions);
     const pill = root.querySelector(".pill");
     if (typeof requestAnimationFrame !== "undefined") requestAnimationFrame(() => this._fit());
     if (pill) {
@@ -670,7 +695,10 @@ class RoomHeroCardEditor extends HTMLElement {
           { name: "hold_action", selector: { ui_action: {} } },
           { name: "double_tap_action", selector: { ui_action: {} } },
           { name: "icon_tap_action", selector: { ui_action: {} } },
-          { name: "icon_hold_action", selector: { ui_action: {} } }
+          { name: "icon_hold_action", selector: { ui_action: {} } },
+          { name: "card_tap_action", selector: { ui_action: {} } },
+          { name: "card_hold_action", selector: { ui_action: {} } },
+          { name: "card_double_tap_action", selector: { ui_action: {} } }
         ]
       }
     ];
