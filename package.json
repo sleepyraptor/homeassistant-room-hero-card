@@ -1,0 +1,25 @@
+{
+  "name": "room-hero-card",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Home Assistant card: a photo of the room that follows its light and the night, with a pill to switch it, values and indicators",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sleepyraptor/homeassistant-room-hero-card"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "screenshots": "node demo/shoot.mjs",
+    "demo": "node -e \"import('./demo/shoot.mjs').then(async m=>{await m.serve(8766);console.log('http://127.0.0.1:8766/demo/')})\""
+  },
+  "devDependencies": {
+    "@mdi/js": "^7.4.47",
+    "happy-dom": "^15.11.7",
+    "puppeteer-core": "^23.11.1"
+  }
+}
